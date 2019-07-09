@@ -1,9 +1,11 @@
-You need to install Clingo on Ubuntu 14.04. To install Clingo, just run this command:
+You need to install Clingo on Ubuntu 18.04. 
+To install Clingo, type the following command: 
 
-	sudo apt-get install gringo
+	sudo apt-get install gringo -y
 
 To test the ASP files, run this command: 
 
-	clingo -c n=10 *.asp
+	clingo -c n=10 *.asp -n 0
 
 where n-1 is the maximum number of actions allowed in planning. 
+where -n means to comute at most <n> models (0 for all)
