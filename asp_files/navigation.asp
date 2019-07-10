@@ -9,7 +9,7 @@ facing(D,I+1) :- approach(D,I), door(D), I=0..n-2.
 beside(D,I+1) :- approach(D,I), door(D), I=0..n-2.
 :- approach(D,I), facing(D,I), door(D), I=0..n-1.
 :- approach(D,I), at(L1,I), door(D), dooracc(L3,D,L2), not acc(L1,L3), not acc(L1,L2), I=0..n-1.
-:- approach(D2, I), door(D1), door(D2), location(L), @dis(D1, D2, L) > @dis(D2, D1, L), I=0..n-1.
+% :- approach(D2, I), door(D1), door(D2), location(L), @dis(D1, D2, L) > @dis(D2, D1, L), I=0..n-1.
 
 at(R,I+1) :- goto(R,I), at(L,I), acc(R,L), location(L), I=0..n-2.
 -facing(D,I+1) :- goto(R,I), door(D), I=0..n-2.
