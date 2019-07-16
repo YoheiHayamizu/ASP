@@ -6,86 +6,138 @@ import sys
 
 
 def sort_tasks(current_task):
-    return int(current_task[1])
+    return current_task[0]
 
 
-
-DIR_NAME = os.path.abspath("./asp_files/") 
+DIR_NAME = os.path.abspath("../asp_navigation/")
 filename = DIR_NAME + "/query.asp"
-def find_plan(init_state,goal_state):
-    # query = "at("+init_state+", 0).\n:- not at("+destination+", n-1).\n#show approach/2.\n#show gothrough/2.\n#show opendoor/2."
-    initial_at = "at("+init_state+", 0)."
+SOLVER = "clingo "
+OPTION_STEP = lambda x: "-c n={0} ".format(x)
+OPTION_ANS = "-n 0 "
+OPTION_FILES = DIR_NAME + "/*.asp " + DIR_NAME + "/cost.lua "
+OPTION_MINIMIZE = "--opt-mode=enum"
 
-    final_at = "\n:- not at("+goal_state+", n-1)."
+
+def parse_plans(output):
+    lines = str(output).split("\\n")
+
+    plans_list = []
+    total_cost_list = []
+    for i, line in enumerate(lines):
+        if line.find("Answer") != -1:
+            plans_list.append(lines[i + 1])
+        if line.find("Optimization") != -1:
+            tmp = line.split(" ")
+            total_cost_list.append(int(tmp[1]))
+
+    plans_group = list()
+    for plan_list in plans_list:
+        plan = plan_list.split()
+        at_list = []
+        action_list = []
+        hasdoor_list = []
+        for p in plan:
+            prefix = p[:p.find("(")]
+            location_step_pair = p[p.find("(") + 1:p.find(")")]
+            tmp = location_step_pair.split(",")
+            if prefix == "at":
+                at_list.append([prefix] + tmp)
+            elif prefix == "hasdoor":
+                hasdoor_list.append([prefix] + tmp)
+            else:
+                action_list.append([prefix] + tmp)
+
+        location_group = []
+        for _, s, t in at_list[:-1]:
+            location = list()
+            i = int(t)
+            """
+                location: ["timestep", "state", "action", "next_state" "door"]
+            """
+            location.append(i)
+            location.append(s)
+            for a in action_list:
+                if a[2] == t:
+                    location.append(a[0])
+                    break
+            location.append(None)
+            for d in hasdoor_list:
+                if d[1] == at_list[i + 1][1]:
+                    location[-1] = d[2]
+                    break
+            location.append(at_list[i + 1][1])
+
+            location_group.append(location)
+        location_group.sort(key=sort_tasks)
+        plans_group.append(location_group)
+
+    return list(zip(total_cost_list, plans_group))
+
+
+def find_plan(init_state, goal_state):
+    # Make file which plans paths.
+    initial_at = "at(" + init_state + ", 0)."
+
+    final_at = "\n:- not at(" + goal_state + ", n-1)."
 
     show_text = """     
+                    \n#minimize { L,X,Y,I: path(X,Y,I), cost(X,Y,L)}.
                     \n#show approach/2.
                     \n#show gothrough/2.
                     \n#show opendoor/2.
                     \n#show goto/2.
                     \n#show at/2.
+                    \n#show hasdoor/2.
+                    \n%#show path/3.
                     \n%#show beside/2.
                     \n%#show facing/2.
                 """
 
-    query2 =initial_at + final_at + show_text
+    query2 = initial_at + final_at + show_text
     f = open(filename, "w")
     f.write(query2)
     f.close()
 
-    goal_list=[]
-    location_group = []
+    # Parse the output from clingo
     output = "UNSATISFIABLE"
-    minimal_step = 0
-    max_step = 0
+    i = 0
     while "UNSATISFIABLE" in str(output):
-        if(max_step > 20):
+        if (i > 20):
             sys.exit()
-        max_step= max_step + 1
-        p = subprocess.Popen("clingo -c n="+str(max_step) + " -n 0" + " " + DIR_NAME +"/*.asp", stdout=subprocess.PIPE, shell=True)
-
+        i = i + 1
+        # print(SOLVER + OPTION_STEP(i) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE)
+        p = subprocess.Popen(SOLVER + OPTION_STEP(i) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE,
+                             stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
+        p.wait()
 
-        p_status = p.wait()
-    minimal_step = max_step
-    p = subprocess.Popen("clingo -c n="+str(max_step) + " -n 0" + " " + DIR_NAME +"/*.asp", stdout=subprocess.PIPE, shell=True)
+    minimal_step = i
+    torelance = minimal_step * 1.5
 
-    (output, err) = p.communicate()
+    plan_T_step_list = list()
+    for j in range(int(torelance)):
+        p = subprocess.Popen(SOLVER + OPTION_STEP(j) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE,
+                             stdout=subprocess.PIPE, shell=True)
+        (output, err) = p.communicate()
+        p.wait()
+        cost_plan_list = parse_plans(output)
+        if len(cost_plan_list) == 0:
+            continue
+        for i in cost_plan_list:
+            plan_T_step_list.append(i)
+    # plan_T_step_list.sort(key=sort_tasks, reverse=True)
+    plan_T_step_list.sort(key=sort_tasks)
+    return plan_T_step_list
 
-    p_status = p.wait()
-    plan=str(output)[str(output).find("Answer")+10:str(output).find("SATISFIABLE")]
-
-    plan_list = plan.split()
-    for actions in plan_list:
-        location_step_pair = actions[actions.find("(")+1:actions.find(")")]
-        location = location_step_pair.split(",")
-        if actions.find('approach')!=-1:
-            location.append(0)
-            location_group.append(location)
-        elif actions.find('opendoor')!=-1:
-            location.append(1)
-            location_group.append(location)
-        elif actions.find('gothrough')!=-1:
-            location.append(2)
-            location_group.append(location)
-        elif actions.find('unload')!=-1:
-            location.append(4)
-            location_group.append(location)
-        elif actions.find('load')!=-1:
-            location.append(3)
-            location_group.append(location)
-    location_group.sort(key = sort_tasks)
-    return location_group
-    # for goals in goal_list:
-    #     print goals
-# text_file = open("asp_output.txt", "w")
-# text_file.write(mySubString)
-# text_file.close()
-#print "Command exit status/return code : ", p_status
 
 if __name__ == '__main__':
     print(DIR_NAME)
     if len(sys.argv) != 3:
-        raise "input init_state, final_goal"
+        raise Exception("input init_state, final_goal")
     test = find_plan(sys.argv[1], sys.argv[2])
-    print(test)
+
+    num = 0
+    for i in test:
+        for j in i:
+            print(j)
+            num += 1
