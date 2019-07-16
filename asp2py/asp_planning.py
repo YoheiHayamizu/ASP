@@ -9,7 +9,7 @@ def sort_tasks(current_task):
     return current_task[0]
 
 
-DIR_NAME = os.path.abspath("../asp_navigation/")
+DIR_NAME = os.path.dirname(__file__)
 filename = DIR_NAME + "/query.asp"
 SOLVER = "clingo "
 OPTION_STEP = lambda x: "-c n={0} ".format(x)
@@ -134,6 +134,7 @@ if __name__ == '__main__':
     print(DIR_NAME)
     if len(sys.argv) != 3:
         raise Exception("input init_state, final_goal")
+
     test = find_plan(sys.argv[1], sys.argv[2])
 
     num = 0
