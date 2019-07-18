@@ -9,12 +9,12 @@ def sort_tasks(current_task):
     return current_task[0]
 
 
-DIR_NAME = os.path.dirname(__file__)
-filename = DIR_NAME + "/query.asp"
+DIR_NAME_ASP = os.path.abspath("./ASP/asp_navigation")
+filename = DIR_NAME_ASP + "/query.asp"
 SOLVER = "clingo "
 OPTION_STEP = lambda x: "-c n={0} ".format(x)
 OPTION_ANS = "-n 0 "
-OPTION_FILES = DIR_NAME + "/*.asp " + DIR_NAME + "/cost.lua "
+OPTION_FILES = DIR_NAME_ASP + "/*.asp " + DIR_NAME_ASP + "/cost.lua "
 OPTION_MINIMIZE = "--opt-mode=enum"
 
 
@@ -105,7 +105,7 @@ def find_plan(init_state, goal_state):
         if (i > 20):
             sys.exit()
         i = i + 1
-        # print(SOLVER + OPTION_STEP(i) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE)
+        print(SOLVER + OPTION_STEP(i) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE)
         p = subprocess.Popen(SOLVER + OPTION_STEP(i) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE,
                              stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
@@ -131,7 +131,7 @@ def find_plan(init_state, goal_state):
 
 
 if __name__ == '__main__':
-    print(DIR_NAME)
+    print(DIR_NAME_PY)
     if len(sys.argv) != 3:
         raise Exception("input init_state, final_goal")
 
