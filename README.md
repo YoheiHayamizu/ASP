@@ -12,9 +12,19 @@ it is for just in case. This directory is the original code when I get this code
 
 # installation
 You need to install Clingo on Ubuntu 18.04. 
-To install Clingo, type the following command: 
+To install Clingo, follow the instruction:
+	
+	git clone https://github.com/potassco/clingo.git <path to clingo>
+	cd <path to clingo>
+	git submodule update --init --recursive
+	
+If you haven't install lua yet;
 
-	sudo apt-get install gringo -y
+	git apt install lua5.3 liblua5.3-dev
+
+	make
+	
+	make install
 
 To test the ASP files, run this command: 
 
