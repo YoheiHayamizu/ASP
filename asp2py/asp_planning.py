@@ -8,14 +8,19 @@ import sys
 def sort_tasks(current_task):
     return current_task[0]
 
-
-DIR_NAME_ASP = os.path.abspath("./ASP/asp_navigation")
+DIR_NAME_BASE = os.path.dirname(__file__)
+DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation")
+DIR_NAME_PY = os.path.abspath(DIR_NAME_BASE + "./../asp2py")
 filename = DIR_NAME_ASP + "/query.asp"
 SOLVER = "clingo "
 OPTION_STEP = lambda x: "-c n={0} ".format(x)
 OPTION_ANS = "-n 0 "
 OPTION_FILES = DIR_NAME_ASP + "/*.asp " + DIR_NAME_ASP + "/cost.lua "
 OPTION_MINIMIZE = "--opt-mode=enum"
+
+# print(DIR_NAME_BASE)
+# print(DIR_NAME_ASP)
+# print(DIR_NAME_PY)
 
 
 def parse_plans(output):
@@ -131,12 +136,10 @@ def find_plan(init_state, goal_state):
 
 
 if __name__ == '__main__':
-    print(DIR_NAME_PY)
-    if len(sys.argv) != 3:
-        raise Exception("input init_state, final_goal")
+    # if len(sys.argv) != 3:
+    #     raise Exception("input init_state, final_goal")
 
-    test = find_plan(sys.argv[1], sys.argv[2])
-
+    test = find_plan("s0", "s10")
     num = 0
     for i in test:
         for j in i:
