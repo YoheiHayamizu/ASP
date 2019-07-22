@@ -105,7 +105,7 @@ def find_plan(init_state, goal_state):
         if (i > 20):
             sys.exit()
         i = i + 1
-        print(SOLVER + OPTION_STEP(i) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE)
+        # print(SOLVER + OPTION_STEP(i) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE)
         p = subprocess.Popen(SOLVER + OPTION_STEP(i) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE,
                              stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
