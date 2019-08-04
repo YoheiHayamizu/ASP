@@ -16,7 +16,7 @@ SOLVER = "clingo "
 OPTION_STEP = lambda x: "-c n={0} ".format(x)
 OPTION_ANS = "-n 0 "
 OPTION_FILES = DIR_NAME_ASP + "/*.asp " + DIR_NAME_ASP + "/cost.lua "
-OPTION_MINIMIZE = "--opt-mode=enum"
+OPTION_MINIMIZE = "--opt-mode=optN"
 
 # print(DIR_NAME_BASE)
 # print(DIR_NAME_ASP)
@@ -33,7 +33,7 @@ def parse_plans(output):
             plans_list.append(lines[i + 1])
         if line.find("Optimization") != -1:
             tmp = line.split(" ")
-            total_cost_list.append(int(tmp[1]))
+            total_cost_list.append(int(tmp[-1]))
 
     plans_group = list()
     for plan_list in plans_list:
@@ -144,4 +144,5 @@ if __name__ == '__main__':
     for i in test:
         for j in i:
             print(j)
-            num += 1
+        num += 1
+    print(num)
