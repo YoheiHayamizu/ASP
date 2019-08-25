@@ -15,6 +15,8 @@ at(s0, 0).
                     
 #show hasdoor/2.
                     
+#show open/2.
+                    
 %#show path/3.
                     
 %#show beside/2.

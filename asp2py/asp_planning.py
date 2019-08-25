@@ -8,6 +8,7 @@ import sys
 def sort_tasks(current_task):
     return current_task[0]
 
+
 DIR_NAME_BASE = os.path.dirname(__file__)
 DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation")
 DIR_NAME_PY = os.path.abspath(DIR_NAME_BASE + "./../asp2py")
@@ -17,6 +18,7 @@ OPTION_STEP = lambda x: "-c n={0} ".format(x)
 OPTION_ANS = "-n 0 "
 OPTION_FILES = DIR_NAME_ASP + "/*.asp " + DIR_NAME_ASP + "/cost.lua "
 OPTION_MINIMIZE = "--opt-mode=optN"
+
 
 # print(DIR_NAME_BASE)
 # print(DIR_NAME_ASP)
@@ -41,6 +43,7 @@ def parse_plans(output):
         at_list = []
         action_list = []
         hasdoor_list = []
+        opendoor_list = []
         for p in plan:
             prefix = p[:p.find("(")]
             location_step_pair = p[p.find("(") + 1:p.find(")")]
@@ -49,28 +52,46 @@ def parse_plans(output):
                 at_list.append([prefix] + tmp)
             elif prefix == "hasdoor":
                 hasdoor_list.append([prefix] + tmp)
+            elif prefix == "open":
+                opendoor_list.append([prefix] + tmp)
             else:
                 action_list.append([prefix] + tmp)
-
+        # print(at_list)
+        # print(action_list)
+        # print(hasdoor_list)
+        # print(opendoor_list)
         location_group = []
         for _, s, t in at_list[:-1]:
             location = list()
             i = int(t)
             """
-                location: ["timestep", "state", "action", "next_state" "door"]
+                location: [timestep, state, door, door_state, action, next_state, next_door, next_door_state]
             """
             location.append(i)
             location.append(s)
+            location.append(None)
+            for d in hasdoor_list:
+                if d[1] == at_list[i][1]:
+                    location[-1] = d[2]
+                    break
+            if ['open', location[-1], str(location[0])] in opendoor_list:
+                location.append(True)
+            else:
+                location.append(False)
             for a in action_list:
                 if a[2] == t:
                     location.append(a[0])
                     break
+            location.append(at_list[i + 1][1])
             location.append(None)
             for d in hasdoor_list:
                 if d[1] == at_list[i + 1][1]:
                     location[-1] = d[2]
                     break
-            location.append(at_list[i + 1][1])
+            if ['open', location[-1], str(location[0] + 1)] in opendoor_list:
+                location.append(True)
+            else:
+                location.append(False)
 
             location_group.append(location)
         location_group.sort(key=sort_tasks)
@@ -93,6 +114,7 @@ def find_plan(init_state, goal_state):
                     \n#show goto/2.
                     \n#show at/2.
                     \n#show hasdoor/2.
+                    \n#show open/2.
                     \n%#show path/3.
                     \n%#show beside/2.
                     \n%#show facing/2.
@@ -141,8 +163,7 @@ if __name__ == '__main__':
 
     test = find_plan("s0", "s10")
     num = 0
-    for i in test:
-        for j in i:
-            print(j)
+    for i, j in test:
+        print(i, j)
         num += 1
     print(num)
