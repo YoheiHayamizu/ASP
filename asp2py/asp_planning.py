@@ -11,6 +11,7 @@ def sort_tasks(current_task):
 
 DIR_NAME_BASE = os.path.dirname(__file__)
 DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation")
+# DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation_hard")
 DIR_NAME_PY = os.path.abspath(DIR_NAME_BASE + "./../asp2py")
 filename = DIR_NAME_ASP + "/query.asp"
 SOLVER = "clingo "
@@ -161,9 +162,10 @@ if __name__ == '__main__':
     # if len(sys.argv) != 3:
     #     raise Exception("input init_state, final_goal")
 
-    test = find_plan("s0", "s10")
+    test = find_plan("s0", "s3")
     num = 0
     for i, j in test:
         print(i, j)
         num += 1
+        # break
     print(num)
