@@ -10,8 +10,8 @@ def sort_tasks(current_task):
 
 
 DIR_NAME_BASE = os.path.dirname(__file__)
-DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation")
-# DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation_hard")
+# DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation")
+DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation_hard")
 DIR_NAME_PY = os.path.abspath(DIR_NAME_BASE + "./../asp2py")
 filename = DIR_NAME_ASP + "/query.asp"
 SOLVER = "clingo "
@@ -19,6 +19,7 @@ OPTION_STEP = lambda x: "-c n={0} ".format(x)
 OPTION_ANS = "-n 0 "
 OPTION_FILES = DIR_NAME_ASP + "/*.asp " + DIR_NAME_ASP + "/cost.lua "
 OPTION_MINIMIZE = "--opt-mode=optN"
+TOLERANCE = 1.
 
 
 # print(DIR_NAME_BASE)
@@ -140,10 +141,10 @@ def find_plan(init_state, goal_state):
         p.wait()
 
     minimal_step = i
-    torelance = minimal_step * 1.5
+    torelance = minimal_step * TOLERANCE
 
     plan_T_step_list = list()
-    for j in range(int(torelance)):
+    for j in range(int(torelance) + 1):
         p = subprocess.Popen(SOLVER + OPTION_STEP(j) + OPTION_ANS + OPTION_FILES + OPTION_MINIMIZE,
                              stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
@@ -162,7 +163,7 @@ if __name__ == '__main__':
     # if len(sys.argv) != 3:
     #     raise Exception("input init_state, final_goal")
 
-    test = find_plan("s0", "s3")
+    test = find_plan("s0", "s14")
     num = 0
     for i, j in test:
         print(i, j)
