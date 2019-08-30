@@ -46,6 +46,7 @@ def parse_plans(output):
         action_list = []
         hasdoor_list = []
         opendoor_list = []
+        cost_dict = {}
         for p in plan:
             prefix = p[:p.find("(")]
             location_step_pair = p[p.find("(") + 1:p.find(")")]
@@ -56,12 +57,16 @@ def parse_plans(output):
                 hasdoor_list.append([prefix] + tmp)
             elif prefix == "open":
                 opendoor_list.append([prefix] + tmp)
+            elif prefix == "cost":
+                cost_dict[tuple([prefix] + tmp[:-1])] = tmp[-1]
             else:
                 action_list.append([prefix] + tmp)
         # print(at_list)
         # print(action_list)
         # print(hasdoor_list)
         # print(opendoor_list)
+        # print(cost_dict)
+
         location_group = []
         for _, s, t in at_list[:-1]:
             location = list()
@@ -94,12 +99,14 @@ def parse_plans(output):
                 location.append(True)
             else:
                 location.append(False)
+            if ('cost', location[1], location[5]) in cost_dict.keys():
+                location.append(cost_dict[('cost', location[1], location[5])])
 
             location_group.append(location)
         location_group.sort(key=sort_tasks)
         plans_group.append(location_group)
 
-    return list(zip(total_cost_list, plans_group))
+    return plans_group
 
 
 def find_plan(init_state, goal_state):
@@ -117,6 +124,7 @@ def find_plan(init_state, goal_state):
                     \n#show at/2.
                     \n#show hasdoor/2.
                     \n#show open/2.
+                    \n#show cost/3.
                     \n%#show path/3.
                     \n%#show beside/2.
                     \n%#show facing/2.
@@ -155,7 +163,9 @@ def find_plan(init_state, goal_state):
         for i in cost_plan_list:
             plan_T_step_list.append(i)
     # plan_T_step_list.sort(key=sort_tasks, reverse=True)
-    plan_T_step_list.sort(key=sort_tasks)
+    # print(plan_T_step_list)
+    # plan_T_step_list.sort(key=sort_tasks)
+    # print(plan_T_step_list)
     return plan_T_step_list
 
 
@@ -163,10 +173,11 @@ if __name__ == '__main__':
     # if len(sys.argv) != 3:
     #     raise Exception("input init_state, final_goal")
 
-    test = find_plan("s0", "s14")
+    test = find_plan("s0", "s4")
+    print(test)
     num = 0
-    for i, j in test:
-        print(i, j)
+    for j in test:
+        print(j)
         num += 1
         # break
     print(num)
