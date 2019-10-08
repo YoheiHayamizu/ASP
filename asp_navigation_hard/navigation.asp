@@ -5,7 +5,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 at(R2,I+1) :- approach(D,I), at(R1,I), hasdoor(R2,D), acc(R1,R2), I=0..n-2.
 facing(D,I+1) :- approach(D,I), door(D), I=0..n-2.
-beside(D,I+1) :- approach(D,I), door(D), I=0..n-2.
+% beside(D,I+1) :- approach(D,I), door(D), I=0..n-2.
 :- approach(D,I), facing(D,I), door(D), I=0..n-1.
 :- approach(D,I), at(R1,I), door(D), dooracc(R3,D,R2), not acc(R1,R3), not acc(R1,R2), I=0..n-1.
 
@@ -41,10 +41,10 @@ open(D,I+1) :- opendoor(D,I), door(D), I=0..n-2.
 %you can be facing only one door at a time
 -facing(D2,I):- facing(D1,I), door(D2), D1 != D2, I=0..n-1.
 
-%you can only be beside a door at any given time (if you delete this,
-%the observations must also return -beside which doesn't happen at the moment.
--beside(D2,I):- beside(D1,I), door(D2), D1 != D2, I=0..n-1.
--beside(D,I+1) :- beside(D,I), at(L,I+1), not hasdoor(L,D), door(D), I=0..n-2.
+% %you can only be beside a door at any given time (if you delete this,
+% %the observations must also return -beside which doesn't happen at the moment.
+% -beside(D2,I):- beside(D1,I), door(D2), D1 != D2, I=0..n-1.
+% -beside(D,I+1) :- beside(D,I), at(L,I+1), not hasdoor(L,D), door(D), I=0..n-2.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,9 +64,9 @@ facing(D,I+1) :- facing(D,I), not -facing(D,I+1), I=0..n-2.
 open(D,I+1) :- open(D,I), not -open(D,I+1), I=0..n-2.
 -open(D,I+1) :- -open(D,I), not open(D,I+1), I=0..n-2.
 
-% beside is inertial
-beside(D,I+1) :- beside(D,I), not -beside(D,I+1), I=0..n-2.
--beside(D,I+1) :- -beside(D,I), not beside(D,I+1), I=0..n-2.
+% % beside is inertial
+% beside(D,I+1) :- beside(D,I), not -beside(D,I+1), I=0..n-2.
+% -beside(D,I+1) :- -beside(D,I), not beside(D,I+1), I=0..n-2.
 
 
 

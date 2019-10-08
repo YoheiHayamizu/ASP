@@ -1,4 +1,4 @@
-at(s14, 0).
+at(s0, 0).
 :- not at(s14, n-1).     
                     
 #minimize { L,X,Y,I: path(X,Y,I), cost(X,Y,L)}.

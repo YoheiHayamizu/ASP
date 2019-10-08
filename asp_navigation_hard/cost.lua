@@ -1,7 +1,7 @@
 #script (lua)
-clingo = require("clingo")
-N = clingo.Number
-F = clingo.Function
+-- clingo = require("clingo4.2")
+-- N = clingo.Number
+-- F = clingo.Function
 
 loc_table={}
 loc_table["s0"] = 0
