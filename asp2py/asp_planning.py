@@ -33,6 +33,7 @@ def parse_plans(output):
     plans_list = []
     total_cost_list = []
     for i, line in enumerate(lines):
+        # print(line)
         if line.find("Answer") != -1:
             plans_list.append(lines[i + 1])
         if line.find("Optimization") != -1:
@@ -173,7 +174,7 @@ if __name__ == '__main__':
     # if len(sys.argv) != 3:
     #     raise Exception("input init_state, final_goal")
 
-    test = find_plan("s0", "s4")
+    test = find_plan("s0", "s14")
     print(test)
     num = 0
     for j in test:
@@ -181,3 +182,4 @@ if __name__ == '__main__':
         num += 1
         # break
     print(num)
+
