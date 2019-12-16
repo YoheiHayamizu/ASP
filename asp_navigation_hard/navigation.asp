@@ -5,26 +5,29 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 at(R2,I+1) :- approach(D,I), at(R1,I), hasdoor(R2,D), acc(R1,R2), I=0..n-2.
 facing(D,I+1) :- approach(D,I), door(D), I=0..n-2.
-% beside(D,I+1) :- approach(D,I), door(D), I=0..n-2.
+beside(D,I+1) :- approach(D,I), door(D), I=0..n-2.
 :- approach(D,I), facing(D,I), door(D), I=0..n-1.
 :- approach(D,I), at(R1,I), door(D), dooracc(R3,D,R2), not acc(R1,R3), not acc(R1,R2), I=0..n-1.
 
 
 at(L,I+1) :- goto(L,I), at(R,I), acc(L,R), I=0..n-2.
 :- goto(L,I), at(L,I), I=0..n-1.
+:- goto(R,I), at(L,I), room(R), R!=L, I=0..n-1.
 :- goto(L2,I), at(L1,I), not acc(L1,L2), I=0..n-1.
-:- goto(L2,I), at(L1,I), acc(R1,L2), not acc(L1,L2), not acc(L1,R1), I=0..n-1.
 
-at(R2,I+1) :- gothrough(D,I), at(R1,I), dooracc(R1,D,R2), room(R1), room(R2), I=0..n-2.
+at(R2,I+1) :- gothrough(D,I), at(R1,I), dooracc(R1,D,R2), hasdoor(R1,D), hasdoor(R2,D), I=0..n-2.
 -facing(D,I+1) :- gothrough(D,I), I=0..n-2.
+beside(D,I+1) :- gothrough(D,I), door(D), I=0..n-2.
 :- gothrough(D,I), not facing(D,I), door(D), I=0..n-1.
 :- gothrough(D,I), not open(D,I), door(D), I=0..n-1.
 :- gothrough(D,I), at(R,I), not hasdoor(R,D), door(D), room(R), I=0..n-1.
+:- gothrough(D,I), at(L,I), location(L), door(D), I=0..n-1.
 
 
 open(D,I+1) :- opendoor(D,I), door(D), I=0..n-2.
 :- opendoor(D,I), not facing(D,I), door(D), I=0..n-1.
 :- opendoor(D,I), open(D,I), door(D), I=0..n-1.
+:- opendoor(D,I), at(L,I), location(L), door(D), I=0..n-1.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -43,8 +46,8 @@ open(D,I+1) :- opendoor(D,I), door(D), I=0..n-2.
 
 % %you can only be beside a door at any given time (if you delete this,
 % %the observations must also return -beside which doesn't happen at the moment.
-% -beside(D2,I):- beside(D1,I), door(D2), D1 != D2, I=0..n-1.
-% -beside(D,I+1) :- beside(D,I), at(L,I+1), not hasdoor(L,D), door(D), I=0..n-2.
+-beside(D2,I):- beside(D1,I), door(D2), D1 != D2, I=0..n-1.
+-beside(D,I+1) :- beside(D,I), at(L,I+1), not hasdoor(L,D), door(D), I=0..n-2.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,8 +68,8 @@ open(D,I+1) :- open(D,I), not -open(D,I+1), I=0..n-2.
 -open(D,I+1) :- -open(D,I), not open(D,I+1), I=0..n-2.
 
 % % beside is inertial
-% beside(D,I+1) :- beside(D,I), not -beside(D,I+1), I=0..n-2.
-% -beside(D,I+1) :- -beside(D,I), not beside(D,I+1), I=0..n-2.
+beside(D,I+1) :- beside(D,I), not -beside(D,I+1), I=0..n-2.
+-beside(D,I+1) :- -beside(D,I), not beside(D,I+1), I=0..n-2.
 
 
 

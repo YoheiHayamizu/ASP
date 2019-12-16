@@ -1,7 +1,5 @@
-at(s0, 0).
-:- not at(s14, n-1).     
-                    
-#minimize { L,X,Y,I: path(X,Y,I), cost(X,Y,L)}.
+at(s5, 0).
+:- not at(s17, n-1).     
                     
 #show approach/2.
                     
@@ -16,8 +14,6 @@ at(s0, 0).
 #show hasdoor/2.
                     
 #show open/2.
-                    
-#show cost/3.
                     
 %#show path/3.
                     

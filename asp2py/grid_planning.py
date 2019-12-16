@@ -10,8 +10,7 @@ def sort_tasks(current_task):
 
 
 DIR_NAME_BASE = os.path.dirname(__file__)
-# DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation")
-DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../asp_navigation_hard")
+DIR_NAME_ASP = os.path.abspath(DIR_NAME_BASE + "./../gridworld")
 DIR_NAME_PY = os.path.abspath(DIR_NAME_BASE + "./../asp2py")
 filename = DIR_NAME_ASP + "/query.asp"
 SOLVER = "clingo "
@@ -26,25 +25,24 @@ TOLERANCE = 1.2
 # print(DIR_NAME_PY)
 
 def arrange_plan(plan):
-    t, s, d, ds, a, sp, nd, nds= plan
-    if nd is None:
-        if a == "goto" or a == "approach":
-            a = (a, int(sp[1:]))
-        else:
-            a = (a, int(s[1:]))
-        sp = "{0}".format(sp)
-    else:
-        if a == "goto" or a == "approach":
-            a = (a, int(sp[1:]))
-        else:
-            a = (a, int(s[1:]))
-        sp = "{0}_{1}_{2}".format(sp, nd, nds)
-    if d is None:
-        s = "{0}".format(s)
-    else:
-        s = "{0}_{1}_{2}".format(s, d, ds)
-    return t, s, d, ds, a, sp, nd, nds
-
+    t, s, d, ds, a, sp, nd, nds, cost = plan
+    # if nd is None:
+    #     if a == "goto" or a == "approach":
+    #         a = (a, int(sp[1:]))
+    #     else:
+    #         a = (a, int(s[1:]))
+    #     sp = "{0}".format(sp)
+    # else:
+    #     if a == "goto" or a == "approach":
+    #         a = (a, int(sp[1:]))
+    #     else:
+    #         a = (a, int(s[1:]))
+    #     sp = "{0}_{1}_{2}".format(sp, nd, nds)
+    # if d is None:
+    #     s = "{0}".format(s)
+    # else:
+    #     s = "{0}_{1}_{2}".format(s, d, ds)
+    return t, s, d, ds, a, sp, nd, nds, cost
 
 def parse_plans(output):
     lines = str(output).split("\\n")
@@ -66,6 +64,7 @@ def parse_plans(output):
         action_list = []
         hasdoor_list = []
         opendoor_list = []
+        cost_dict = {}
         for p in plan:
             prefix = p[:p.find("(")]
             location_step_pair = p[p.find("(") + 1:p.find(")")]
@@ -76,6 +75,8 @@ def parse_plans(output):
                 hasdoor_list.append([prefix] + tmp)
             elif prefix == "open":
                 opendoor_list.append([prefix] + tmp)
+            elif prefix == "cost":
+                cost_dict[tuple([prefix] + tmp[:-1])] = tmp[-1]
             else:
                 action_list.append([prefix] + tmp)
         # print(at_list)
@@ -85,14 +86,14 @@ def parse_plans(output):
         # print(cost_dict)
 
         location_group = []
-        for _, s, t in at_list[:-1]:
+        for _, x, y, t in at_list[:-1]:
             location = list()
             i = int(t)
             """
                 location: [timestep, state, door, door_state, action, next_state, next_door, next_door_state]
             """
             location.append(i)
-            location.append(s)
+            location.append('s: ('+x+', '+y+')')
             location.append(None)
             for d in hasdoor_list:
                 if d[1] == at_list[i][1]:
@@ -103,10 +104,10 @@ def parse_plans(output):
             else:
                 location.append(False)
             for a in action_list:
-                if a[2] == t:
+                if a[-1] == t:
                     location.append(a[0])
                     break
-            location.append(at_list[i + 1][1])
+            location.append('s: ('+at_list[i + 1][1]+', '+at_list[i + 1][2]+')')
             location.append(None)
             for d in hasdoor_list:
                 if d[1] == at_list[i + 1][1]:
@@ -116,30 +117,34 @@ def parse_plans(output):
                 location.append(True)
             else:
                 location.append(False)
+            if ('cost', location[1], location[5]) in cost_dict.keys():
+                location.append(cost_dict[('cost', location[1], location[5])])
+            else:
+                location.append(None)
 
             location_group.append(location)
         location_group.sort(key=sort_tasks)
         plans_group.append(location_group)
+
     return plans_group
 
 
 def find_plan(init_state, goal_state):
     # Make file which plans paths.
-    initial_at = "at(" + init_state + ", 0)."
-
-    final_at = "\n:- not at(" + goal_state + ", n-1)."
+    initial_at = "at(" + init_state[4:8] + ", 0)."
+    final_at = "\n:- not at(" + str(goal_state)[1:-1] + ", n-1)."
+    #
+    # initial_at = "at(" + init_state + ", 0)."
+    # final_at = "\n:- not at(" + goal_state + ", n-1)."
 
     show_text = """     
-                    \n#show approach/2.
-                    \n#show gothrough/2.
-                    \n#show opendoor/2.
-                    \n#show goto/2.
-                    \n#show at/2.
-                    \n#show hasdoor/2.
-                    \n#show open/2.
-                    \n%#show path/3.
-                    \n%#show beside/2.
-                    \n%#show facing/2.
+    \n#show at/3.
+    \n%#show obst/5.
+    \n
+    \n#show up/3.
+    \n#show down/3.
+    \n#show right/3.
+    \n#show left/3.
                 """
 
     query2 = initial_at + final_at + show_text
@@ -185,15 +190,11 @@ if __name__ == '__main__':
     # if len(sys.argv) != 3:
     #     raise Exception("input init_state, final_goal")
 
-    test = find_plan("s0", "s17")
+    test = find_plan("s: (1, 0)", "(4, 4)")
     # print(test)
     num = 0
     for j in test:
-        # print(j)
-        for i in j:
-            print(i[1], i[4], i[5], end="\t")
+        print(j)
         num += 1
-        print()
         # break
     print(num)
-
