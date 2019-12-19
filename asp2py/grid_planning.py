@@ -17,7 +17,7 @@ SOLVER = "clingo "
 OPTION_STEP = lambda x: "-c n={0} ".format(x)
 OPTION_ANS = "-n 0 "
 OPTION_FILES = DIR_NAME_ASP + "/*.asp "
-TOLERANCE = 1.2
+TOLERANCE = 1.5
 
 
 # print(DIR_NAME_BASE)
@@ -42,7 +42,7 @@ def arrange_plan(plan):
     #     s = "{0}".format(s)
     # else:
     #     s = "{0}_{1}_{2}".format(s, d, ds)
-    return t, s, d, ds, a, sp, nd, nds, cost
+    return t, s, d, ds, a, sp, nd, nds
 
 def parse_plans(output):
     lines = str(output).split("\\n")

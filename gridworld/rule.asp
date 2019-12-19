@@ -1,5 +1,5 @@
-#const max_y = 7.
-#const max_x = 7.
+#const max_y = 4.
+#const max_x = 4.
 
 % up causes at(X,Y+1) if at(X,Y).
 % nonexecutable up if at(X,max_y).
@@ -38,11 +38,16 @@ at(X, Y, I+1) :- at(X, Y, I), not -at(X,Y,I+1), I=0..n-2.
 obst(X2,Y2,X1,Y1,I) :- obst(X1,Y1,X2,Y2,I).
 
 %obstacles that are always there
-obst(3,Y,4,Y,I) :- Y=1..3, I=0..n-1.
-obst(X,0,X,1,I) :- X=1..1, I=0..n-1.
-obst(X,0,X,1,I) :- X=3..3, I=0..n-1.
-obst(0, 1, 1, 1, I):- I=0..n-1.
-obst(0, 1, 0, 2, I):- I=0..n-1.
+obst(X, Y, X+1, Y, I):- X=0..1, Y=1, I=0..n-1.
+obst(X, Y, X+1, Y, I):- X=2..3, Y=1, I=0..n-1.
+obst(X, Y, X+1, Y, I):- X=0..1, Y=2, I=0..n-1.
+obst(X, Y, X+1, Y, I):- X=2..3, Y=2, I=0..n-1.
+obst(X, Y, X+1, Y, I):- X=2..3, Y=3, I=0..n-1.
+
+obst(X, Y, X, Y+1, I):- X=0, Y=1..2, I=0..n-1.
+obst(X, Y, X, Y+1, I):- X=1, Y=0..2, I=0..n-1.
+obst(X, Y, X, Y+1, I):- X=3, Y=0..3, I=0..n-1.
+
 %if at some point you know about an obstacle, it doesn't go away
 obst(X,Y,Z,K,I) :- obst(X,Y,Z,K,I-1), not -obst(X,Y,Z,K,I), I=0..n-1.
 
