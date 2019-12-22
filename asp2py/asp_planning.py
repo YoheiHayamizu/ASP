@@ -119,6 +119,16 @@ def parse_plans(output):
 
             location_group.append(location)
         location_group.sort(key=sort_tasks)
+        # if location_group:
+        #     location_group.append([location_group[-1][0]+1,
+        #                            location_group[-1][5],
+        #                            location_group[-1][6],
+        #                            location_group[-1][7],
+        #                            "Exit",
+        #                            location_group[-1][5],
+        #                            location_group[-1][6],
+        #                            location_group[-1][7],
+        #                            None])  # for the last action set
         plans_group.append(location_group)
     return plans_group
 
@@ -185,7 +195,7 @@ if __name__ == '__main__':
     # if len(sys.argv) != 3:
     #     raise Exception("input init_state, final_goal")
 
-    test = find_plan("s0", "s17")
+    test = find_plan("s8", "s17")
     # print(test)
     num = 0
     for j in test:

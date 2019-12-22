@@ -17,7 +17,7 @@ SOLVER = "clingo "
 OPTION_STEP = lambda x: "-c n={0} ".format(x)
 OPTION_ANS = "-n 0 "
 OPTION_FILES = DIR_NAME_ASP + "/*.asp "
-TOLERANCE = 1.5
+TOLERANCE = 1.2
 
 
 # print(DIR_NAME_BASE)
@@ -124,8 +124,18 @@ def parse_plans(output):
 
             location_group.append(location)
         location_group.sort(key=sort_tasks)
+        # if location_group:
+        #     location_group.append([location_group[-1][0]+1,
+        #                            location_group[-1][5],
+        #                            location_group[-1][6],
+        #                            location_group[-1][7],
+        #                            "Exit",
+        #                            location_group[-1][5],
+        #                            location_group[-1][6],
+        #                            location_group[-1][7],
+        #                            None])  # for the last action set
         plans_group.append(location_group)
-
+    # print(plans_group)
     return plans_group
 
 
