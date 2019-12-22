@@ -42,7 +42,7 @@ def arrange_plan(plan):
     #     s = "{0}".format(s)
     # else:
     #     s = "{0}_{1}_{2}".format(s, d, ds)
-    return t, s, d, ds, a, sp, nd, nds, cost
+    return t, s, d, ds, a, sp, nd, nds
 
 def parse_plans(output):
     lines = str(output).split("\\n")
@@ -124,8 +124,18 @@ def parse_plans(output):
 
             location_group.append(location)
         location_group.sort(key=sort_tasks)
+        # if location_group:
+        #     location_group.append([location_group[-1][0]+1,
+        #                            location_group[-1][5],
+        #                            location_group[-1][6],
+        #                            location_group[-1][7],
+        #                            "Exit",
+        #                            location_group[-1][5],
+        #                            location_group[-1][6],
+        #                            location_group[-1][7],
+        #                            None])  # for the last action set
         plans_group.append(location_group)
-
+    # print(plans_group)
     return plans_group
 
 
